@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Christian Cadisch — Portfolio</title>
+  <meta name="description" content="Portfolio of coding projects, research, and experience." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Christian Cadisch</h1>
+    <p>Engineer · Researcher · Consultant</p>
+    <nav>
+      <a href="#projects">Projects</a>
+      <a href="#research">Research</a>
+      <a href="#about">About</a>
+      <a href="CV.pdf">CV</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="projects">
+      <h2>Projects</h2>
+      <article>
+        <h3>Serve Detector (Swift, Vision)</h3>
+        <p>Detects peak wrist position during a tennis serve using Apple’s Vision framework. Improved accuracy via temporal smoothing.</p>
+        <p><a href="https://github.com/youruser/serve-detector">Code</a></p>
+      </article>
+      <article>
+        <h3>Protein Variant Hotspots</h3>
+        <p>Analyzed spatial mutation clusters across sarcomeric proteins, integrating AlphaMissense predictions for disease variants.</p>
+        <p><a href="https://github.com/youruser/protein-hotspots">Code</a></p>
+      </article>
+    </section>
+
+    <section id="research">
+      <h2>Research</h2>
+      <ul>
+        <li>“Title of Paper” — Journal (Year) [<a href="#">Link</a>]</li>
+      </ul>
+    </section>
+
+    <section id="about">
+      <h2>About</h2>
+      <p>I’m a consultant at McKinsey Switzerland with a background in computer science and biomedical AI. I enjoy building useful tools at the intersection of data, software, and science.</p>
+      <p>Contact: <a href="mailto:you@domain.com">you@domain.com</a></p>
+    </section>
+  </main>
+
+  <footer>
+    <small>© <span id="y"></span> Christian Cadisch</small>
+    <script>document.getElementById("y").textContent = new Date().getFullYear();</script>
+  </footer>
+</body>
+</html>
