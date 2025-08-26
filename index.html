@@ -4,53 +4,164 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Christian Cadisch — Portfolio</title>
-  <meta name="description" content="Portfolio of coding projects, research, and experience." />
+  <meta name="description" content="Engineer & researcher building AI tools for health and sport. Selected projects, research, and leadership." />
+  <meta property="og:title" content="Christian Cadisch — Portfolio" />
+  <meta property="og:description" content="Engineer & researcher building AI tools for health and sport." />
+  <meta property="og:type" content="website" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header>
-    <h1>Christian Cadisch</h1>
-    <p>Engineer · Researcher · Consultant</p>
-    <nav>
-      <a href="#projects">Projects</a>
-      <a href="#research">Research</a>
-      <a href="#about">About</a>
-      <a href="https://github.com/ChristianCadisch/ChristianCadisch.github.io/blob/15d10dc94b0ae3a6129a689bfc5942457193d352/CV.pdf">CV</a>
-    </nav>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header" role="banner">
+    <div class="wrap">
+      <h1 class="brand">Christian Cadisch</h1>
+      <p class="tagline">Engineer & researcher — building AI tools for health and sport.</p>
+      <nav aria-label="Primary" class="site-nav">
+        <a href="#featured">Projects</a>
+        <a href="#other-projects">Other Tech</a>
+        <a href="#advisory">Strategy & Advisory</a>
+        <a href="#leadership">Leadership</a>
+        <a href="CV.pdf" aria-label="Download CV">CV</a>
+        <a href="mailto:you@domain.com" aria-label="Email">Email</a>
+        <a href="https://github.com/ChristianCadisch" rel="me">GitHub</a>
+        <a href="https://www.linkedin.com/in/PLACEHOLDER" rel="me">LinkedIn</a>
+      </nav>
+    </div>
   </header>
 
-  <main>
-    <section id="projects">
-      <h2>Projects</h2>
-      <article>
-        <h3>Serve Detector (Swift, Vision)</h3>
-        <p>Detects peak wrist position during a tennis serve using Apple’s Vision framework. Improved accuracy via temporal smoothing.</p>
-        <p><a href="https://github.com/youruser/serve-detector">Code</a></p>
+  <main id="main" class="wrap" role="main">
+    <section id="featured" class="section">
+      <h2>Featured Projects</h2>
+
+      <article class="card featured">
+        <div class="card-media">
+          <img src="images/tennis-ai.jpg" alt="Tennis AI coach demo (pose overlay)" />
+        </div>
+        <div class="card-body">
+          <h3>Tennis AI Coach</h3>
+          <p class="muted">Swift · Vision · VNHumanBodyPoseObservation · ML</p>
+          <ul>
+            <li>Detects peak wrist position during serve; temporal smoothing for robust maxima.</li>
+            <li>On-device feedback loop; near-real-time overlay and coaching cues.</li>
+            <li>Improved precision over naive single-frame peak by X–Y% (placeholder metric).</li>
+          </ul>
+          <div class="card-cta">
+            <a class="btn" href="https://github.com/youruser/serve-detector">View Code</a>
+            <a class="btn btn-ghost" href="https://PLACEHOLDER.demo">Live Demo</a>
+          </div>
+        </div>
       </article>
-      <article>
-        <h3>Protein Variant Hotspots</h3>
-        <p>Analyzed spatial mutation clusters across sarcomeric proteins, integrating AlphaMissense predictions for disease variants.</p>
-        <p><a href="https://github.com/youruser/protein-hotspots">Code</a></p>
+
+      <article class="card featured">
+        <div class="card-media">
+          <img src="images/tennis-bot.jpg" alt="Reservation bot console output" />
+        </div>
+        <div class="card-body">
+          <h3>Stanford Tennis Court Reservation Bot</h3>
+          <p class="muted">Python · Automation · Scheduling</p>
+          <ul>
+            <li>Automates 7pm court booking with login, slot search, and conflict handling.</li>
+            <li>Retries with jitter; alerting on success/failure.</li>
+            <li>Reduced manual time to near-zero; success rate X% (placeholder).</li>
+          </ul>
+          <div class="card-cta">
+            <a class="btn" href="https://github.com/youruser/tennis-reservation-bot">View Code</a>
+            <a class="btn btn-ghost" href="https://PLACEHOLDER.writeup">Write-up</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card featured">
+        <div class="card-media">
+          <img src="images/thesis.jpg" alt="Protein structure with variant clusters" />
+        </div>
+        <div class="card-body">
+          <h3>Master’s Thesis — Spatial Mutation Hotspots</h3>
+          <p class="muted">Structural biology · AlphaMissense · Graph/cluster analysis</p>
+          <ul>
+            <li>Identified spatial clusters across sarcomeric proteins (e.g., MYH7, MYBPC3).</li>
+            <li>Integrated AlphaMissense priors; mapped clinical variants onto structures.</li>
+            <li>Validated cluster enrichment; implications for variant interpretation.</li>
+          </ul>
+          <div class="card-cta">
+            <a class="btn" href="https://PLACEHOLDER.paper">Paper/Preprint</a>
+            <a class="btn btn-ghost" href="https://github.com/youruser/protein-hotspots">Code</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card featured">
+        <div class="card-media">
+          <img src="images/stroke-ml.jpg" alt="Stroke risk prediction visualization" />
+        </div>
+        <div class="card-body">
+          <h3>Stroke Risk Prediction</h3>
+          <p class="muted">ML · Clinical data · Evaluation</p>
+          <ul>
+            <li>Built and evaluated models for stroke risk on structured clinical features.</li>
+            <li>Calibrated probabilities; assessed fairness and error trade-offs.</li>
+            <li>Reported AUC/PR and decision thresholds (placeholder metrics).</li>
+          </ul>
+          <div class="card-cta">
+            <a class="btn" href="https://github.com/youruser/stroke-prediction">View Code</a>
+            <a class="btn btn-ghost" href="https://PLACEHOLDER.report">Technical Report</a>
+          </div>
+        </div>
       </article>
     </section>
 
-    <section id="research">
-      <h2>Research</h2>
-      <ul>
-        <li>“Title of Paper” — Journal (Year) [<a href="#">Link</a>]</li>
+    <section id="other-projects" class="section">
+      <h2>Other Technical Projects</h2>
+      <div class="grid">
+        <article class="card small">
+          <h3>IBM Chemical Extraction</h3>
+          <p class="muted">NLP · IE</p>
+          <p>Information extraction pipeline for chemical entities and relations.</p>
+          <p><a class="text-link" href="https://github.com/youruser/chemical-extraction">Code</a></p>
+        </article>
+
+        <article class="card small">
+          <h3>Body Pose Estimation</h3>
+          <p class="muted">CV · Coursework</p>
+          <p>Implemented pose estimation baseline; evaluated on custom tennis clips.</p>
+          <p><a class="text-link" href="https://github.com/youruser/pose-estimation">Code</a></p>
+        </article>
+
+        <article class="card small">
+          <h3>BERTweet Classifier</h3>
+          <p class="muted">NLP · Transfer learning</p>
+          <p>Fine-tuned BERTweet for downstream classification; error analysis.</p>
+          <p><a class="text-link" href="https://github.com/youruser/bertweet-classifier">Code</a></p>
+        </article>
+      </div>
+    </section>
+
+    <section id="advisory" class="section">
+      <h2>Strategy & Tech Advisory</h2>
+      <ul class="bullets">
+        <li>AI in R&D for chemical manufacturer — microbiome, multi-omics, knowledge retrieval.</li>
+        <li>Business case for data foundations platform in pharma — architecture & ROI.</li>
+        <li>Simplification of digital roles in pharma — operating model & role taxonomy.</li>
       </ul>
     </section>
 
-    <section id="about">
-      <h2>About</h2>
-      <p>I’m a consultant at McKinsey Switzerland with a background in computer science and biomedical AI. I enjoy building useful tools at the intersection of data, software, and science.</p>
-      <p>Contact: <a href="mailto:you@domain.com">you@domain.com</a></p>
+    <section id="leadership" class="section">
+      <h2>Leadership & Extracurriculars</h2>
+      <ul class="bullets compact">
+        <li>Sequoia Club — <span class="muted">member/role (placeholder)</span></li>
+        <li>NextGen Board — <span class="muted">role (placeholder)</span></li>
+        <li>InCube Challenge — <span class="muted">participant/mentor (placeholder)</span></li>
+        <li>Wingman Campus Fund — <span class="muted">scout/role (placeholder)</span></li>
+      </ul>
     </section>
   </main>
 
-  <footer>
-    <small>© <span id="y"></span> Christian Cadisch</small>
-    <script>document.getElementById("y").textContent = new Date().getFullYear();</script>
+  <footer class="site-footer" role="contentinfo">
+    <div class="wrap">
+      <small>© <span id="y"></span> Christian Cadisch · <a href="mailto:you@domain.com">you@domain.com</a></small>
+    </div>
+    <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
   </footer>
 </body>
 </html>
