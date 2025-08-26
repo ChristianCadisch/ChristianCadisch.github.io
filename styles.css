@@ -138,3 +138,45 @@ body{
   .timeline-logo{width:48px; height:48px}
 }
 
+/* Append to styles.css */
+.pillgrid{
+  display:grid;
+  gap:var(--gap);
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+.pill{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:var(--pad);
+}
+.pill-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:6px;
+}
+.pill-title{
+  margin:0;
+  font-size:18px;
+}
+.pill-link{
+  font-size:14px;
+  text-decoration:none;
+  border:1px solid var(--border);
+  padding:6px 10px;
+  border-radius:10px;
+  color:inherit;
+}
+.pill-link:hover{background:#f5f5f5}
+.pill p{margin:6px 0}
+@media (max-width: 860px){
+  .pillgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width: 560px){
+  .pillgrid{grid-template-columns:1fr}
+}
+
+
+
