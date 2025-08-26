@@ -172,7 +172,6 @@ body{
   .timeline-logo{width:48px; height:48px}
 }
 
-/* Append to styles.css */
 .pillgrid{
   display:grid;
   gap:var(--gap);
@@ -264,4 +263,103 @@ body{
 }
 
 
+/* Top bar */
+.topbar{background:#eee0; border-bottom:1px solid var(--border); backdrop-filter:saturate(140%) blur(6px)}
+.topbar__row{display:flex; align-items:center; justify-content:space-between; padding:12px 0}
+.topbar__nav a, .topbar__meta a{
+  text-decoration:none; color:var(--text); font-weight:600; margin-right:14px;
+}
+
+.topbar__meta a{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 0;        /* give vertical room */
+  line-height:1;        /* avoid extra baseline space */
+}
+
+.topbar__meta .icon{
+  width:18px;
+  height:18px;
+  display:block;        /* no descender clipping */
+  flex:0 0 18px;
+  overflow:visible;     /* ensure strokes aren’t cut */
+  vertical-align:middle;
+}
+
+
+
+.topbar__nav a:hover, .topbar__meta a:hover{text-decoration:underline}
+
+/* Hero */
+.hero{padding:36px 0 24px; background:var(--bg)}
+.hero__inner{display:flex; flex-direction:column; align-items:center; text-align:center}
+.hero__avatar{
+  width:140px;   /* was 108px */
+  height:140px;
+  border-radius:50%;
+  object-fit:cover;
+  border:1px solid var(--border);
+  background:#fff;
+  box-shadow:0 1px 0 rgba(0,0,0,.03);
+}
+
+.hero__name{
+  margin:14px 0 16px;
+  font-size:36px;
+  line-height:1.15;
+  display:inline-block;      /* shrinkwrap to text */
+  position:relative;         /* anchor the underline */
+  padding-bottom:10px;       /* space for the rule */
+}
+
+.hero__name::after{
+  content:"";
+  position:absolute;
+  bottom:0;
+  left:-5%;                   /* make it slightly narrower than the text */
+  width:110%;                 /* 100% would match the text exactly */
+  height:3px;
+  background:var(--text);
+  border-radius:2px;
+}
+
+.hero__rule{ display:none; }
+
+.hero__tag{margin:0 0 6px; color:var(--muted)}
+.hero__bio{max-width:760px; margin:6px 0 12px; text-align: left;}
+.hero__actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:center}
+
+/* Buttons already exist; ensure nicer ghost */
+.btn-ghost{background:transparent}
+
+/* Responsive tweaks */
+@media (max-width:560px){
+  .hero__name{font-size:28px}
+  .topbar__row{flex-direction:column; gap:8px}
+  .topbar__meta a{margin-left:10px}
+}
+
+/* CV button with icon style */
+.btn-cv{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 18px;
+  border-radius:12px;
+  border:2px solid #12a0ec;
+  text-decoration:none;
+  color:#12a0ec;
+  font-weight:700;
+  background:#fff;
+  transition:background .2s,color .2s;
+}
+.btn-cv:hover{
+  background:#12a0ec;
+  color:#fff;
+}
+.btn-cv .icon{
+  font-size:18px;
+  line-height:1;
+}
 
