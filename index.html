@@ -6,7 +6,7 @@
   <title>Christian Cadisch — Portfolio</title>
   <meta name="description" content="Engineer & researcher building AI tools for health and sport. Selected projects, research, and leadership." />
   <meta property="og:title" content="Christian Cadisch — Portfolio" />
-  <meta property="og:description" content="Building AI tools for health and sport" />
+  <meta property="og:description" content="Building AI tools for health and sports" />
   <meta property="og:type" content="website" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -60,7 +60,7 @@
     <img class="hero__avatar" src="assets/profile_picture.png" alt="Christian Cadisch">
     <h1 class="hero__name">Christian Cadisch</h1>
     <hr class="hero__rule" aria-hidden="true">
-    <p class="hero__tag">Building AI tools for health and sport</p>
+    <p class="hero__tag">Building AI tools for health and sports</p>
     <p class="hero__bio">
       Graduate of <a href="https://ethz.ch">ETH Zürich</a> in Electrical Engineering & Computer Science, with research stints at <a href="https://stanford.edu">Stanford</a> and <a href="https://mit.edu">MIT</a>. 
       Currently at McKinsey, helping global companies sharpen their digital edge and unlock AI’s full potential.  
@@ -99,47 +99,54 @@
         </div>
       </article>
 
+    </section>
 
-      <article class="card featured">
-        <div class="card-media">
-          <video autoplay loop muted playsinline width="100%" poster="assets/8ACT_protein.jpg">
-            <source src="assets/8ACT.mp4" type="video/mp4">
-            <img src="assets/8ACT.png" alt="Protein structure with variant clusters" />
-          </video>
-        </div>
-        <div class="card-body">
-          <h3>Master’s Thesis — Spatial Mutation Hotspots</h3>
-          <p class="muted">Structural biology · AlphaMissense · Graph/cluster analysis</p>
-          <ul>
-            <li>Identified spatial clusters across sarcomeric proteins (e.g., MYH7, MYBPC3)</li>
-            <li>Integrated AlphaMissense priors; mapped clinical variants onto structures</li>
-            <li>Validated cluster enrichment; implications for variant interpretation</li>
-          </ul>
-          <div class="card-cta">
-            <a class="btn" href="https://PLACEHOLDER.paper">Paper/Preprint</a>
-            <a class="btn btn-ghost" href="https://github.com/youruser/protein-hotspots">Code</a>
-          </div>
-        </div>
-      </article>
+    <section id="featured-pair" class="section">
 
-      <article class="card featured">
-        <div class="card-media">
-          <img src="assets/stroke.png" alt="Stroke risk prediction visualization" />
-        </div>
-        <div class="card-body">
-          <h3>Stroke Risk Prediction — Non-linear Framingham Score</h3>
-          <p class="muted">Machine Learning · Clinical Risk Modeling · Interpretability</p>
-          <ul>
-            <li>Co-developed the Non-linear Framingham Stroke Risk Score (N-SRS) using Optimal Classification Trees on Framingham Heart Study data</li>
-            <li>Integrated novel features (ECG markers, hematocrit, treatment status) and advanced imputation (MedImpute) to handle missing values</li>
-            <li>Demonstrated significant improvement over the Revised FSRS: AUC ↑ to ~0.87 in derivation and ~0.74 in external validation cohorts</li>
-          </ul>
-          <div class="card-cta">
-            <a class="btn" href="https://github.com/agniorf/NSRS">View Code</a>
-            <a class="btn btn-ghost" href="https://doi.org/10.1371/journal.pone.0232414">Publication</a>
+
+      <!-- Insert inside #featured where the two articles should sit side-by-side -->
+      <!-- :contentReference[oaicite:0]{index=0} -->
+      <div class="featured-pair">
+        <article class="card mid">
+          <div class="card-media">
+            <video autoplay loop muted playsinline width="100%" poster="assets/8ACT_protein.jpg">
+              <source src="assets/8ACT.mp4" type="video/mp4">
+              <img src="assets/8ACT.png" alt="Protein structure with variant clusters" />
+            </video>
           </div>
-        </div>
-      </article>
+          <div class="card-body">
+            <h3>Master’s Thesis — Spatial Mutation Hotspots</h3>
+            <p class="muted">Structural biology · Graph/cluster analysis</p>
+            <ul>
+              <li>Identified spatial clusters across sarcomeric proteins (e.g., MYH7, MYBPC3)</li>
+              <li>Integrated AlphaMissense priors; mapped clinical variants onto structures</li>
+            </ul>
+            <div class="card-cta">
+              <a class="btn" href="https://PLACEHOLDER.paper">Paper/Preprint</a>
+              <a class="btn btn-ghost" href="https://github.com/youruser/protein-hotspots">Code</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card mid">
+          <div class="card-media">
+            <img src="assets/stroke.png" alt="Stroke risk prediction visualization" />
+          </div>
+          <div class="card-body">
+            <h3>Stroke Risk Prediction — Non-linear Framingham Score</h3>
+            <p class="muted">Machine Learning · Interpretability</p>
+            <ul>
+              <li>Co-developed the Non-linear Framingham Stroke Risk Score (N-SRS) using Optimal Classification Trees</li>
+              <li>Integrated novel features (ECG markers, hematocrit, treatment status) </li>
+            </ul>
+            <div class="card-cta">
+              <a class="btn" href="https://github.com/agniorf/NSRS">View Code</a>
+              <a class="btn btn-ghost" href="https://doi.org/10.1371/journal.pone.0232414">Publication</a>
+            </div>
+          </div>
+        </article>
+      </div>
+
 
  
     
@@ -147,7 +154,6 @@
 
 
     <section id="other-projects" class="section">
-      <h2>Other Projects</h2>
       <div class="grid">
 
         <article class="card small">
