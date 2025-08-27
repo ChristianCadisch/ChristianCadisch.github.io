@@ -409,6 +409,19 @@ body {
   margin-top: 0; 
 }
 
+/* Restore bullets in the mid card list */
+.card.mid ul { 
+  list-style: disc; 
+  padding-left: 1.1rem; 
+}
+
+.card.mid li {
+  display: list-item;         /* required for list markers */
+  -webkit-line-clamp: unset;
+  -webkit-box-orient: unset;
+  overflow: visible;
+}
+
 
 
 
