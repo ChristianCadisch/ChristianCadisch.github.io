@@ -424,6 +424,50 @@ body {
 
 
 
+/* Replace your .feature layout with area-based columns so text is always ~2/3 */
+.feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); /* media | body */
+  grid-template-areas: "media body";
+  gap: var(--gap);
+  align-items: center;
+  margin: 24px 0;
+}
+.feature + .feature { margin-top: 32px; }
+
+.feature-media { grid-area: media; }
+.feature-body  { grid-area: body; }
+
+/* Alternate layout: swap areas and column fractions so text stays ~2/3 on the left */
+.feature--alt {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); /* body | media */
+  grid-template-areas: "body media";
+}
+
+/* Image sizing (optional cap; adjust as you like) */
+.feature-media img {
+  width: 100%;
+  height: auto;
+  max-width: 150px;
+  display: block;
+  border-radius: var(--radius);
+  margin: 0 auto;
+}
+
+.feature-caption { margin-top: 6px; font-size: 0.95rem; color: var(--muted); }
+.feature h3 { margin: 0 0 8px; }
+.feature p { margin: 0 0 8px; }
+
+@media (max-width: 820px) {
+  .feature,
+  .feature--alt {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "media"
+      "body";
+  }
+}
+
 
 /* Responsive: stack on narrow screens */
 @media (max-width: 900px){
@@ -432,5 +476,56 @@ body {
   .card.mid .card-media{
     min-height:auto;
     aspect-ratio:16/9;
+  }
+}
+
+
+/* Add to styles.css */
+
+.feature-duo__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+  max-width: 1100px;     /* widen container if needed */
+  margin: 0 auto;
+}
+
+.feature-duo__grid figure {
+  width: 100%;           /* take full half of grid */
+  text-align: left;      /* better readability for caption text */
+}
+
+.feature-duo__grid img {
+  display: block;
+  margin: 0 auto 16px;   /* keep image centered at top */
+  max-width: 280px;      /* cap screenshot width */
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+}
+
+.feature-duo__grid figcaption {
+  color: var(--text);
+  max-width: none;       /* let caption use full width of column */
+}
+
+.feature-duo__grid h3 {
+  margin: 0 0 8px;
+}
+
+.feature-duo__grid p {
+  margin: 0 0 10px;
+}
+
+.feature-duo__grid ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+@media (max-width: 820px) {
+  .feature-duo__grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
   }
 }

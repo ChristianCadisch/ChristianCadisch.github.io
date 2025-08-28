@@ -36,47 +36,81 @@
   <main id="main" class="wrap">
     <section class="section">
       <h1>Tennis AI Coach</h1>
-      <p class="muted">Swift · Vision · VNHumanBodyPoseObservation · On-device ML</p>
+      <p class="muted">Swift · Computer Vision · On-device ML</p>
 
       <p>
-        An on-device computer vision app that analyzes tennis serves in real time. Set your phone courtside; the app detects body keypoints,
-        finds the peak wrist frame, estimates serve speed, and generates concise, pro-style tips—without leaving the device.
+        An on-device computer vision app that analyzes tennis serves in real time. The app detects body keypoints and ball trajectories, thereby measuring the serve speed, and generating concise techique tips.
       </p>
 
-<div class="card" style="margin: 1.2rem 0;">
-  <div class="card-media" style="aspect-ratio:16/9; overflow:hidden;">
-    <iframe 
-      src="https://www.youtube.com/embed/GdJaosgI6JI?autoplay=1&mute=1&controls=1&cc_load_policy=1&rel=0&modestbranding=1" 
-      title="YouTube video player" 
-      allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-      referrerpolicy="strict-origin-when-cross-origin" 
-      allowfullscreen 
-      style="width:100%; height:100%; border:0; display:block;">
-    </iframe>
-  </div>
-  <p class="muted" style="margin-top:.6rem;">Demo: on-device analysis, instant coach feedback loop.</p>
+      <div class="card" style="margin: 1.2rem 0;">
+        <div class="card-media" style="aspect-ratio:16/9; overflow:hidden;">
+          <iframe 
+            src="https://www.youtube.com/embed/GdJaosgI6JI?autoplay=1&mute=1&controls=1&cc_load_policy=1&rel=0&modestbranding=1" 
+            title="YouTube video player" 
+            allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            referrerpolicy="strict-origin-when-cross-origin" 
+            allowfullscreen 
+            style="width:100%; height:100%; border:0; display:block;">
+          </iframe>
+        </div>
+        <p class="muted" style="margin-top:.6rem;">Demo: on-device serve analysis and speed estimation</p>
+      </div>
+
+
+
+<div class="feature-duo__grid">
+  <figure>
+    <img src="assets/serve_speed.png" alt="CLAY app showing most recent serve and speed history">
+    <figcaption>
+      <h3>Serve speed</h3>
+      <p>Estimates velocity from ball trajectories observed across frames and overlays results in real time</p>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <img src="assets/trophy_pose.png" alt="CLAY app showing pose overlay and technique checklist">
+    <figcaption>
+      <h3>Technique feedback</h3>
+      <p>
+        Analyzes your serve to detect the
+        <a href="https://tenniscompanion.org/serve-trophy-pose/">trophy pose</a>
+        and the
+        <a href="https://www.feeltennis.net/tennis-serve-contact/">moment of contact</a>,
+        surfacing concise, actionable feedback on how to improve your serve
+      </p>
+    </figcaption>
+  </figure>
 </div>
 
+<p class="muted" style="margin-top:.8rem;">
+  These are actual in-app screenshots from the 
+  <a href="https://github.com/ChristianCadisch/AI-serve-feedback" 
+     style="color:inherit; text-decoration:underline;">
+     working prototype
+  </a>, not design mock-ups
+</p>
 
 
-      <h2 style="margin-top:28px;">What it does</h2>
+
+
+      <h2 style="margin-top:28px;">Technical implementation details</h2>
       <ul>
-        <li>Tracks pose and detects the exact frame where the wrist reaches its apex during the toss/swing.</li>
-        <li>Computes serve speed from video timing and camera parameters; overlays results on device.</li>
-        <li>Generates coaching tips based on pose dynamics (arm extension, shoulder tilt, knee drive).</li>
-        <li>Runs fully on-device for low latency and privacy; no upload required.</li>
+        <li><b>Pose estimation pipeline:</b> Apple Vision’s <code>VNHumanBodyPoseObservation</code> with custom temporal smoothing to stabilize joint keypoints and detect serve phases (trophy pose and contact) across frame sequences</li>
+        <li><b>Trajectory analysis:</b> Real-time ball tracking via <code>VNDetectTrajectoriesRequest</code>, using frame differentials and polynomial coefficient filters (parabolic fits, left-to-right validation, confidence thresholds &gt;0.6) to isolate valid serve trajectories</li>
+        <li><b>Speed computation:</b> Serve velocity derived from frame timestamps, trajectory length, and duration windows; parabolic extrapolation fills early path segments to increase precision before contact</li>
+        <li><b>Overlay architecture:</b> Frame-accurate overlays rendered through a SwiftUI/UIView hybrid, with a custom <code>TrajectoryView</code> for path rendering and <code>UILabel</code>-driven real-time speed feedback</li>
+        <li><b>AI coaching logic:</b> Custom <code>AICoach</code> class applies geometric heuristics (e.g., joint angle calculations, elbow-over-shoulder thresholds, wrist height derivatives) to detect suboptimal mechanics and output rule-based feedback prompts</li>
+        <li><b>On-device design:</b> Entire inference and feedback loop runs locally (AVFoundation + Vision), optimizing for low-latency analysis, privacy, and offline usability</li>
       </ul>
 
-      <h2 style="margin-top:28px;">Tech highlights</h2>
-      <ul>
-        <li>Apple Vision framework pose estimation with temporal smoothing for robust maxima detection.</li>
-        <li>Frame-accurate cueing and overlay pipeline written in Swift/UIKit + SwiftUI hosting.</li>
-        <li>Lightweight feature extraction → rules/ML prompts to suggest actionable technique fixes.</li>
-      </ul>
+
+      <br>
+
+      <p><em><strong>The app is in prototype stage: App Store release planned after further UI/UX refinements</strong></em></p>
 
       <div class="card-cta" style="margin-top:14px;">
-        <a class="btn" href="https://github.com/ChristianCadisch/AI-serve-feedback">Code</a>
-        <a class="btn btn-ghost" href="https://github.com/ChristianCadisch/AI-serve-feedback#readme">Readme</a>
+        <a class="btn btn-ghost" href="https://github.com/ChristianCadisch/AI-serve-feedback">Code for serve speed</a>
+        <a class="btn btn-ghost" href="https://github.com/ChristianCadisch/AI-serve-feedback#readme">Code for technique feedback</a>
       </div>
     </section>
   </main>
