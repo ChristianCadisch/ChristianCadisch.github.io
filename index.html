@@ -104,9 +104,29 @@
     <section id="featured-pair" class="section">
 
 
-      <!-- Insert inside #featured where the two articles should sit side-by-side -->
-      <!-- :contentReference[oaicite:0]{index=0} -->
+
       <div class="featured-pair">
+
+
+        <article class="card mid">
+          <div class="card-media">
+            <img src="assets/stroke.png" alt="Stroke risk prediction visualization" />
+          </div>
+          <div class="card-body">
+            <h3>Non-linear Stroke Risk Prediction</h3>
+            <p class="muted">Interpretability · Mixed integer optimization</p>
+            <ul>
+              <li>Co-developed a non-linear stroke risk score using mixed integer optimization</li>
+              <li>Outperformed traditional interpretable classification models by ~10%</li>
+            </ul>
+            <div class="card-cta">
+              <a class="btn" href="https://github.com/agniorf/NSRS">Code</a>
+              <a class="btn btn-ghost" href="https://doi.org/10.1371/journal.pone.0232414">Publication</a>
+            </div>
+          </div>
+        </article>
+
+
         <article class="card mid">
           <div class="card-media">
             <video autoplay loop muted playsinline width="100%" poster="assets/8ACT_protein.jpg">
@@ -127,23 +147,6 @@
           </div>
         </article>
 
-        <article class="card mid">
-          <div class="card-media">
-            <img src="assets/stroke.png" alt="Stroke risk prediction visualization" />
-          </div>
-          <div class="card-body">
-            <h3>Non-linear Stroke Risk Prediction</h3>
-            <p class="muted">Interpretability · Mixed integer optimization</p>
-            <ul>
-              <li>Co-developed a non-linear stroke risk score using mixed integer optimization</li>
-              <li>Outperformed traditional interpretable classification models by ~10%</li>
-            </ul>
-            <div class="card-cta">
-              <a class="btn" href="https://github.com/agniorf/NSRS">Code</a>
-              <a class="btn btn-ghost" href="https://doi.org/10.1371/journal.pone.0232414">Publication</a>
-            </div>
-          </div>
-        </article>
       </div>
 
 
@@ -156,18 +159,20 @@
       <div class="grid">
 
         <article class="card small">
+          <h3>Named Entity Recognition for Chemical Patents</h3>
+          <p class="muted">IBM Research · NLP</p>
+          <p>Annotated corpus and trained transformer models for IUPAC entity extraction from patent text</p>
+          <p><a class="text-link" href="https://christiancadisch.github.io/IBM_Technical_Report.pdf" target="_blank" rel="noopener"
+              >Report</a></p>
+        </article>
+
+        <article class="card small">
           <h3>Stanford Tennis Court Reservation Bot</h3>
           <p class="muted">Automation · Scheduling</p>
           <p>Automates daily 7pm court booking with login, slot search, and retry logic</p>
           <p><a class="text-link" href="https://github.com/ChristianCadisch/stanford-tennis-bot">Code</a></p>
         </article>
-        <article class="card small">
-          <h3>Chemical Entity Recognition for Patents</h3>
-          <p class="muted">IBM Research · NLP</p>
-          <p>Annotated corpus and transformer models for IUPAC entity extraction from patent text</p>
-          <p><a class="text-link" href="https://christiancadisch.github.io/IBM_Technical_Report.pdf" target="_blank" rel="noopener"
-              >Report</a></p>
-        </article>
+
         <article class="card small">
           <h3>MYBPC3 Variant Assays (HCM)</h3>
           <p class="muted">Functional Genomics · Co-author</p>
@@ -292,11 +297,15 @@
     
   </main>
 
-  <footer class="site-footer" role="contentinfo">
-    <div class="wrap">
-      <small>© <span id="y"></span> Christian Cadisch · <a href="mailto:christian.cadisch@gmail.com">christian.cadisch@gmail.com</a></small>
-    </div>
-    <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
-  </footer>
+<footer class="site-footer" role="contentinfo">
+  <div class="wrap">
+    <small>© <span id="y"></span> Christian Cadisch · 
+      <a href="books.html">Book recommendations 📚 </a>
+    </small>
+  </div>
+  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+</footer>
+
+
 </body>
 </html>
