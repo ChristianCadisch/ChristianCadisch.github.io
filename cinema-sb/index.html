@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Video Debug</title>
+    <title>Cinema SB</title>
+    <link rel="icon" type="image/png" href="./cinema-sb-icon.png" />
+    <link rel="apple-touch-icon" href="./cinema-sb-icon.png" />
     <style>
       html,
       body {
@@ -377,10 +379,20 @@
         return defaultVideoUrl;
       }
 
+      function resolveMetadata() {
+        const currentUrl = new URL(window.location.href);
+        return {
+          title: (currentUrl.searchParams.get("title") || "Shared Video").trim(),
+          meta: (currentUrl.searchParams.get("meta") || "Cinema SB Preview").trim(),
+          description: (currentUrl.searchParams.get("description") || "Open the app to save places, browse the map, and unlock the full experience.").trim()
+        };
+      }
+
       function loadVideo() {
         frame.innerHTML = "";
 
         const url = resolveVideoUrl();
+        const metadata = resolveMetadata();
         const uid = extractCloudflareUid(url);
 
         const overlay = document.createElement("div");
@@ -402,7 +414,7 @@
           iframe.allow = "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture";
           iframe.allowFullscreen = true;
           frame.appendChild(iframe);
-          frame.appendChild(buildChrome());
+          frame.appendChild(buildChrome(metadata));
           frame.appendChild(overlay);
           return;
         }
@@ -415,12 +427,12 @@
         video.controls = true;
         video.playsInline = true;
         frame.appendChild(video);
-        frame.appendChild(buildChrome());
+        frame.appendChild(buildChrome(metadata));
         frame.appendChild(overlay);
         void video.play().catch(() => {});
       }
 
-      function buildChrome() {
+      function buildChrome(metadata) {
         const chrome = document.createDocumentFragment();
 
         const topFade = document.createElement("div");
@@ -443,9 +455,9 @@
         content.innerHTML = `
           <div class="text-stack">
             <p class="eyebrow">Cinema SB Pick</p>
-            <h1 class="title">Shared Video</h1>
-            <p class="meta">Cinema SB Preview</p>
-            <p class="description">Open the app to save places, browse the map, and unlock the full experience.</p>
+            <h1 class="title">${escapeHtml(metadata.title)}</h1>
+            <p class="meta">${escapeHtml(metadata.meta)}</p>
+            <p class="description">${escapeHtml(metadata.description)}</p>
           </div>
           <div class="actions">
             <a class="action-button" href="#" data-app-interaction="true">
@@ -483,6 +495,15 @@
         chrome.appendChild(tabBar);
 
         return chrome;
+      }
+
+      function escapeHtml(value) {
+        return value
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll("\"", "&quot;")
+          .replaceAll("'", "&#39;");
       }
 
       function iconHeart() {
