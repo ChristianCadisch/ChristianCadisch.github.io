@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Debug</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #000;
+        color: #fff;
+        font-family: system-ui, sans-serif;
+      }
+
+      .page {
+        min-height: 100%;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      .frame {
+        width: min(100%, 420px);
+        aspect-ratio: 9 / 16;
+        background: #111;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 20px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .top-fade,
+      .bottom-fade {
+        position: absolute;
+        inset-inline: 0;
+        pointer-events: none;
+      }
+
+      .top-fade {
+        top: 0;
+        height: 148px;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.48) 0%, rgba(0, 0, 0, 0) 100%);
+      }
+
+      .bottom-fade {
+        bottom: 70px;
+        height: 250px;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0) 10%, rgba(0, 0, 0, 0.76) 100%);
+      }
+
+      .frame-overlay {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: end center;
+        padding: 24px;
+        pointer-events: none;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0) 58%, rgba(0, 0, 0, 0.34) 100%);
+      }
+
+      .frame-overlay button {
+        pointer-events: auto;
+      }
+
+      video,
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        display: block;
+        background: #000;
+      }
+
+      button {
+        font: inherit;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+      }
+
+      button {
+        padding: 12px 14px;
+        background: #d1a64a;
+        color: #16120a;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .floating-pill,
+      .action-button,
+      .tab-item {
+        position: absolute;
+        z-index: 3;
+        text-decoration: none;
+      }
+
+      .floating-pill {
+        top: 24px;
+        left: 24px;
+        padding: 10px 16px;
+        border-radius: 999px;
+        background: rgba(28, 28, 31, 0.82);
+        color: #fff5e2;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        backdrop-filter: blur(14px);
+      }
+
+      .content-overlay {
+        position: absolute;
+        inset-inline: 0;
+        bottom: 98px;
+        z-index: 3;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 22px;
+      }
+
+      .text-stack {
+        max-width: 255px;
+      }
+
+      .eyebrow {
+        margin: 0 0 10px;
+        color: #f0cd84;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .title {
+        margin: 0;
+        color: #fff8ee;
+        font-size: 31px;
+        line-height: 0.95;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+      }
+
+      .meta {
+        margin: 8px 0 0;
+        color: rgba(255, 245, 226, 0.94);
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .description {
+        margin: 10px 0 0;
+        color: rgba(255, 245, 226, 0.84);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .actions {
+        display: grid;
+        gap: 12px;
+      }
+
+      .action-button {
+        position: static;
+        display: grid;
+        justify-items: center;
+        gap: 6px;
+        width: 58px;
+        color: #fff8ee;
+      }
+
+      .action-icon {
+        width: 48px;
+        height: 48px;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        background: rgba(41, 41, 45, 0.82);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        font-size: 20px;
+        backdrop-filter: blur(12px);
+      }
+
+      .action-icon svg,
+      .tab-icon svg {
+        width: 22px;
+        height: 22px;
+        display: block;
+      }
+
+      .action-label {
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .tab-bar {
+        position: absolute;
+        inset-inline: 14px;
+        bottom: 14px;
+        z-index: 3;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 24px;
+        background: rgba(17, 17, 19, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(18px);
+      }
+
+      .tab-item {
+        position: static;
+        display: grid;
+        justify-items: center;
+        gap: 5px;
+        color: rgba(255, 245, 226, 0.72);
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .tab-item.is-active {
+        color: #f3d28a;
+      }
+
+      .tab-icon {
+        width: 24px;
+        height: 24px;
+        display: grid;
+        place-items: center;
+      }
+
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: rgba(0, 0, 0, 0.56);
+        backdrop-filter: blur(12px);
+        z-index: 20;
+      }
+
+      .modal-backdrop.is-visible {
+        display: flex;
+      }
+
+      .modal-card {
+        width: min(100%, 420px);
+        padding: 24px;
+        border-radius: 28px;
+        background: linear-gradient(180deg, rgba(37, 37, 41, 0.98) 0%, rgba(24, 24, 27, 0.98) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+      }
+
+      .modal-kicker {
+        margin: 0 0 12px;
+        color: #f0cd84;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .modal-title {
+        margin: 0;
+        color: #fff8ee;
+        font-size: 20px;
+        line-height: 1.05;
+        font-weight: 800;
+      }
+
+      .modal-copy {
+        margin: 14px 0 0;
+        color: rgba(255, 245, 226, 0.82);
+        font-size: 14px;
+        line-height: 1.45;
+      }
+
+      .modal-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 22px;
+      }
+
+      .modal-link,
+      .modal-dismiss {
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 52px;
+        padding: 12px 18px;
+        border-radius: 999px;
+        text-decoration: none;
+      }
+
+      .modal-link {
+        background: #d1a64a;
+        color: #16120a;
+        border: 0;
+      }
+
+      .modal-dismiss {
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff8ee;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="frame" id="frame"></div>
+    </div>
+
+    <div class="modal-backdrop" id="download-modal" aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <p class="modal-kicker">More functionality lives in the app</p>
+        <h2 class="modal-title" id="modal-title">Download Cinema SB for the full experience</h2>
+        <p class="modal-copy">
+          Save places, browse the full map, build guides, and unlock the complete video-first city guide experience in the app.
+        </p>
+        <div class="modal-actions">
+          <a class="modal-link" href="https://exampleapp.com" target="_blank" rel="noreferrer">Download the app</a>
+          <button class="modal-dismiss" id="dismiss-modal" type="button">Not now</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const frame = document.getElementById("frame");
+      const defaultVideoUrl = "https://videodelivery.net/98dd81bafb69d8abf94c5f652e78f5c9/manifest/video.m3u8";
+      const modal = document.getElementById("download-modal");
+      const dismissModalButton = document.getElementById("dismiss-modal");
+
+      loadVideo();
+      bindModalEvents();
+
+      function extractCloudflareUid(url) {
+        try {
+          const parsed = new URL(url);
+          if (!parsed.hostname.includes("videodelivery.net")) {
+            return "";
+          }
+          const parts = parsed.pathname.split("/").filter(Boolean);
+          return parts[0] || "";
+        } catch {
+          return "";
+        }
+      }
+
+      function resolveVideoUrl() {
+        const currentUrl = new URL(window.location.href);
+        const queryVideo = currentUrl.searchParams.get("video");
+        if (queryVideo) {
+          return queryVideo;
+        }
+
+        const hashVideo = currentUrl.hash.slice(1).trim();
+        if (hashVideo) {
+          return decodeURIComponent(hashVideo);
+        }
+
+        const indexPathMarker = "/index.html/";
+        const path = currentUrl.pathname;
+        const markerIndex = path.indexOf(indexPathMarker);
+        if (markerIndex >= 0) {
+          const encodedPathVideo = path.slice(markerIndex + indexPathMarker.length).trim();
+          if (encodedPathVideo) {
+            return decodeURIComponent(encodedPathVideo);
+          }
+        }
+
+        return defaultVideoUrl;
+      }
+
+      function loadVideo() {
+        frame.innerHTML = "";
+
+        const url = resolveVideoUrl();
+        const uid = extractCloudflareUid(url);
+
+        const overlay = document.createElement("div");
+        overlay.className = "frame-overlay";
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = "Load Video";
+        button.addEventListener("click", loadVideo);
+        overlay.appendChild(button);
+
+        if (uid) {
+          const iframe = document.createElement("iframe");
+          const playerUrl = new URL(`https://iframe.videodelivery.net/${uid}`);
+          playerUrl.searchParams.set("autoplay", "true");
+          playerUrl.searchParams.set("muted", "true");
+          playerUrl.searchParams.set("controls", "true");
+          playerUrl.searchParams.set("loop", "true");
+          iframe.src = playerUrl.toString();
+          iframe.allow = "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture";
+          iframe.allowFullscreen = true;
+          frame.appendChild(iframe);
+          frame.appendChild(buildChrome());
+          frame.appendChild(overlay);
+          return;
+        }
+
+        const video = document.createElement("video");
+        video.src = url;
+        video.muted = true;
+        video.autoplay = true;
+        video.loop = true;
+        video.controls = true;
+        video.playsInline = true;
+        frame.appendChild(video);
+        frame.appendChild(buildChrome());
+        frame.appendChild(overlay);
+        void video.play().catch(() => {});
+      }
+
+      function buildChrome() {
+        const chrome = document.createDocumentFragment();
+
+        const topFade = document.createElement("div");
+        topFade.className = "top-fade";
+        chrome.appendChild(topFade);
+
+        const bottomFade = document.createElement("div");
+        bottomFade.className = "bottom-fade";
+        chrome.appendChild(bottomFade);
+
+        const pill = document.createElement("a");
+        pill.className = "floating-pill";
+        pill.href = "#";
+        pill.dataset.appInteraction = "true";
+        pill.textContent = "Discover";
+        chrome.appendChild(pill);
+
+        const content = document.createElement("div");
+        content.className = "content-overlay";
+        content.innerHTML = `
+          <div class="text-stack">
+            <p class="eyebrow">Cinema SB Pick</p>
+            <h1 class="title">Shared Video</h1>
+            <p class="meta">Cinema SB Preview</p>
+            <p class="description">Open the app to save places, browse the map, and unlock the full experience.</p>
+          </div>
+          <div class="actions">
+            <a class="action-button" href="#" data-app-interaction="true">
+              <span class="action-icon">${iconHeart()}</span>
+              <span class="action-label">Like</span>
+            </a>
+            <a class="action-button" href="#" data-app-interaction="true">
+              <span class="action-icon">${iconShare()}</span>
+              <span class="action-label">Share</span>
+            </a>
+          </div>
+        `;
+        chrome.appendChild(content);
+
+        const tabBar = document.createElement("div");
+        tabBar.className = "tab-bar";
+        tabBar.innerHTML = `
+          <a class="tab-item is-active" href="#" data-app-interaction="true">
+            <span class="tab-icon">${iconPlayRectangle()}</span>
+            <span>Feed</span>
+          </a>
+          <a class="tab-item" href="#" data-app-interaction="true">
+            <span class="tab-icon">${iconMap()}</span>
+            <span>Map</span>
+          </a>
+          <a class="tab-item" href="#" data-app-interaction="true">
+            <span class="tab-icon">${iconBook()}</span>
+            <span>Guides</span>
+          </a>
+          <a class="tab-item" href="#" data-app-interaction="true">
+            <span class="tab-icon">${iconHeart()}</span>
+            <span>Liked</span>
+          </a>
+        `;
+        chrome.appendChild(tabBar);
+
+        return chrome;
+      }
+
+      function iconHeart() {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54z"></path>
+          </svg>
+        `;
+      }
+
+      function iconShare() {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 16V5"></path>
+            <path d="M8 9l4-4 4 4"></path>
+            <path d="M5 14.5v2.5A1.5 1.5 0 0 0 6.5 18.5h11A1.5 1.5 0 0 0 19 17v-2.5"></path>
+          </svg>
+        `;
+      }
+
+      function iconPlayRectangle() {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+            <path d="M4.75 5.5A1.75 1.75 0 0 1 6.5 3.75h11A1.75 1.75 0 0 1 19.25 5.5v13A1.75 1.75 0 0 1 17.5 20.25h-11A1.75 1.75 0 0 1 4.75 18.5zm5.2 2.9v7.2l5.85-3.6z"></path>
+          </svg>
+        `;
+      }
+
+      function iconMap() {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+            <path d="M15.2 4.2a1.8 1.8 0 0 1 1.2 0l3.4 1.28c.73.27 1.2.97 1.2 1.74v11.24c0 1.17-1.16 2-2.28 1.63l-3.9-1.3a1.8 1.8 0 0 0-1.14 0l-4.5 1.5a1.8 1.8 0 0 1-1.2 0l-3.86-1.29A1.75 1.75 0 0 1 3 17.35V6.1c0-1.2 1.2-2.04 2.34-1.64l3.85 1.35c.38.13.8.13 1.18 0zm-.7 2.12-4 1.33v10.03l4-1.33zm1.5 10.03 3.5 1.17V7.5L16 6.33zm-10-8.87v10.02l3 .99V8.47z"></path>
+          </svg>
+        `;
+      }
+
+      function iconBook() {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+            <path d="M6.75 4h9.5A2.75 2.75 0 0 1 19 6.75v10.5A2.75 2.75 0 0 1 16.25 20H7.5A3.5 3.5 0 0 1 4 16.5V6.75A2.75 2.75 0 0 1 6.75 4m0 1.5A1.25 1.25 0 0 0 5.5 6.75v9.75A2 2 0 0 0 7.5 18.5h8.75a1.25 1.25 0 0 0 1.25-1.25v-.75H8.2a1.7 1.7 0 0 1-1.7-1.7z"></path>
+          </svg>
+        `;
+      }
+
+      function bindModalEvents() {
+        document.addEventListener("click", (event) => {
+          const trigger = event.target.closest("[data-app-interaction='true']");
+          if (!trigger) {
+            return;
+          }
+          event.preventDefault();
+          openModal();
+        });
+
+        dismissModalButton.addEventListener("click", closeModal);
+
+        modal.addEventListener("click", (event) => {
+          if (event.target === modal) {
+            closeModal();
+          }
+        });
+
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") {
+            closeModal();
+          }
+        });
+      }
+
+      function openModal() {
+        modal.classList.add("is-visible");
+        modal.setAttribute("aria-hidden", "false");
+      }
+
+      function closeModal() {
+        modal.classList.remove("is-visible");
+        modal.setAttribute("aria-hidden", "true");
+      }
+    </script>
+  </body>
+</html>
