@@ -158,6 +158,51 @@
         line-height: 1.35;
       }
 
+      .description-toggle {
+        margin: 10px 0 0;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: rgba(255, 245, 226, 0.84);
+        font: inherit;
+        font-weight: 400;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .description-toggle .description {
+        margin: 0;
+        color: rgba(255, 245, 226, 0.84);
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 1.35;
+      }
+
+      .description-toggle.is-collapsed .description {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+      }
+
+      .description-toggle.is-collapsed .description-label::after {
+        content: "more";
+      }
+
+      .description-toggle.is-expanded .description-label::after {
+        content: "less";
+      }
+
+      .description-label {
+        display: inline-block;
+        margin-top: 4px;
+        color: rgba(255, 245, 226, 0.72);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        text-transform: lowercase;
+      }
+
       .actions {
         display: grid;
         gap: 12px;
@@ -593,7 +638,7 @@
             <p class="eyebrow">Cinema SB Pick</p>
             <h1 class="title">${escapeHtml(metadata.title)}</h1>
             <p class="meta">${escapeHtml(metadata.meta)}</p>
-            <p class="description">${escapeHtml(metadata.description)}</p>
+            ${buildDescriptionMarkup(metadata.description)}
           </div>
           <div class="actions">
             <a class="action-button" href="#" data-app-interaction="true">
@@ -630,7 +675,31 @@
         `;
         chrome.appendChild(tabBar);
 
+        attachDescriptionToggle(chrome);
         return chrome;
+      }
+
+      function buildDescriptionMarkup(description) {
+        const safeDescription = escapeHtml(description);
+        return `
+          <button class="description-toggle is-collapsed" type="button" aria-expanded="false">
+            <p class="description">${safeDescription}</p>
+            <span class="description-label" aria-hidden="true"></span>
+          </button>
+        `;
+      }
+
+      function attachDescriptionToggle(root) {
+        const toggle = root.querySelector?.(".description-toggle");
+        if (!toggle) {
+          return;
+        }
+
+        toggle.addEventListener("click", () => {
+          const isExpanded = toggle.classList.toggle("is-expanded");
+          toggle.classList.toggle("is-collapsed", !isExpanded);
+          toggle.setAttribute("aria-expanded", isExpanded ? "true" : "false");
+        });
       }
 
       function escapeHtml(value) {
