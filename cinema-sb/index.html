@@ -335,35 +335,69 @@
     <script>
       const frame = document.getElementById("frame");
       const defaultVideoUrl = "https://videodelivery.net/98dd81bafb69d8abf94c5f652e78f5c9/manifest/video.m3u8";
+      const metadataApiBaseUrl = "https://proud-cloud-879dcinema-sb-metadata-api.serafin-065.workers.dev";
+      const defaultMetadata = {
+        title: "Shared Video",
+        meta: "Cinema SB Preview",
+        description: "Open the app to save places, browse the map, and unlock the full experience."
+      };
       const modal = document.getElementById("download-modal");
       const dismissModalButton = document.getElementById("dismiss-modal");
 
-      loadVideo();
+      void loadVideo();
       bindModalEvents();
 
+      function normalizeString(value) {
+        return (value || "").trim();
+      }
+
       function extractCloudflareUid(url) {
+        const raw = normalizeString(url);
+        if (!raw) {
+          return "";
+        }
+
         try {
-          const parsed = new URL(url);
+          const parsed = new URL(raw);
           if (!parsed.hostname.includes("videodelivery.net")) {
             return "";
           }
           const parts = parsed.pathname.split("/").filter(Boolean);
           return parts[0] || "";
         } catch {
-          return "";
+          return /^[a-z0-9]{32}$/i.test(raw) ? raw : "";
         }
       }
 
-      function resolveVideoUrl() {
+      function buildCloudflareVideoUrl(uid) {
+        return `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+      }
+
+      function resolveRequestedVideo() {
         const currentUrl = new URL(window.location.href);
-        const queryVideo = currentUrl.searchParams.get("video");
+        const sharedUid = normalizeString(currentUrl.searchParams.get("v"));
+        if (sharedUid) {
+          return {
+            uid: sharedUid,
+            videoUrl: buildCloudflareVideoUrl(sharedUid)
+          };
+        }
+
+        const queryVideo = normalizeString(currentUrl.searchParams.get("video"));
         if (queryVideo) {
-          return queryVideo;
+          return {
+            uid: extractCloudflareUid(queryVideo),
+            videoUrl: queryVideo
+          };
         }
 
         const hashVideo = currentUrl.hash.slice(1).trim();
         if (hashVideo) {
-          return decodeURIComponent(hashVideo);
+          const decodedVideo = decodeURIComponent(hashVideo);
+          return {
+            uid: extractCloudflareUid(decodedVideo),
+            videoUrl: decodedVideo
+          };
         }
 
         const indexPathMarker = "/index.html/";
@@ -372,35 +406,114 @@
         if (markerIndex >= 0) {
           const encodedPathVideo = path.slice(markerIndex + indexPathMarker.length).trim();
           if (encodedPathVideo) {
-            return decodeURIComponent(encodedPathVideo);
+            const decodedVideo = decodeURIComponent(encodedPathVideo);
+            return {
+              uid: extractCloudflareUid(decodedVideo),
+              videoUrl: decodedVideo
+            };
           }
         }
 
-        return defaultVideoUrl;
-      }
-
-      function resolveMetadata() {
-        const currentUrl = new URL(window.location.href);
         return {
-          title: (currentUrl.searchParams.get("title") || "Shared Video").trim(),
-          meta: (currentUrl.searchParams.get("meta") || "Cinema SB Preview").trim(),
-          description: (currentUrl.searchParams.get("description") || "Open the app to save places, browse the map, and unlock the full experience.").trim()
+          uid: extractCloudflareUid(defaultVideoUrl),
+          videoUrl: defaultVideoUrl
         };
       }
 
-      function loadVideo() {
+      function resolveFallbackMetadata() {
+        const currentUrl = new URL(window.location.href);
+        return {
+          title: normalizeString(currentUrl.searchParams.get("title")) || defaultMetadata.title,
+          meta: normalizeString(currentUrl.searchParams.get("meta")) || defaultMetadata.meta,
+          description: normalizeString(currentUrl.searchParams.get("description")) || defaultMetadata.description
+        };
+      }
+
+      async function fetchLocationMetadata(uid) {
+        if (!uid) {
+          return null;
+        }
+
+        const candidatePaths = ["/api/spots", "/locations"];
+        for (const path of candidatePaths) {
+          try {
+            const response = await fetch(`${metadataApiBaseUrl}${path}`, { mode: "cors" });
+            if (!response.ok) {
+              continue;
+            }
+
+            const payload = await response.json();
+            const locations = Array.isArray(payload) ? payload : Array.isArray(payload?.data) ? payload.data : [];
+            const match = locations.find((location) => locationMatchesUid(location, uid));
+            if (match) {
+              return {
+                title: normalizeString(match.title) || defaultMetadata.title,
+                meta: buildMetaLine(match),
+                description: buildDescription(match)
+              };
+            }
+          } catch {
+            continue;
+          }
+        }
+
+        return null;
+      }
+
+      function locationMatchesUid(location, uid) {
+        const candidates = [
+          location?.stream_uid,
+          location?.streamUid,
+          location?.stream_hls_url,
+          location?.streamHlsUrl,
+          location?.video_url,
+          location?.videoUrl
+        ];
+
+        return candidates.some((value) => extractCloudflareUid(value) === uid);
+      }
+
+      function buildMetaLine(location) {
+        const category =
+          location?.location_categories?.[0]?.categories?.label ||
+          location?.locationCategories?.[0]?.categories?.label ||
+          "";
+
+        return normalizeString(category) || "New York City";
+      }
+
+      function buildDescription(location) {
+        return (
+          normalizeString(location?.long_desc) ||
+          normalizeString(location?.longDesc) ||
+          normalizeString(location?.short_desc) ||
+          normalizeString(location?.shortDesc) ||
+          defaultMetadata.description
+        );
+      }
+
+      async function resolveMetadata(uid) {
+        const fallback = resolveFallbackMetadata();
+        const fetched = await fetchLocationMetadata(uid);
+        return fetched || fallback;
+      }
+
+      async function loadVideo() {
         frame.innerHTML = "";
 
-        const url = resolveVideoUrl();
-        const metadata = resolveMetadata();
-        const uid = extractCloudflareUid(url);
+        const requestedVideo = resolveRequestedVideo();
+        const metadata = await resolveMetadata(requestedVideo.uid);
+        const uid = requestedVideo.uid;
+        const url = requestedVideo.videoUrl;
 
         const overlay = document.createElement("div");
         overlay.className = "frame-overlay";
         const button = document.createElement("button");
         button.type = "button";
         button.textContent = "Load Video";
-        button.addEventListener("click", loadVideo);
+        button.addEventListener("click", () => {
+          void loadVideo();
+        });
         overlay.appendChild(button);
 
         if (uid) {

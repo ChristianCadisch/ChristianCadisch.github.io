@@ -1,14 +1,21 @@
 const params = new URLSearchParams(window.location.search);
+const metadataApiBaseUrl = "https://proud-cloud-879dcinema-sb-metadata-api.serafin-065.workers.dev";
+const defaultVideoUrl = "https://videodelivery.net/98dd81bafb69d8abf94c5f652e78f5c9/manifest/video.m3u8";
+const defaultMetadata = {
+  title: "A cinematic city moment",
+  kicker: "Cinema SB pick",
+  meta: "Cinema SB Preview",
+  description: "Open the app to see the full route, save the place, and start the walk.",
+};
 
 const state = {
   appUrl: params.get("app") || "https://exampleapp.com",
-  videoUrl: params.get("video") || "",
-  title: params.get("title") || "A cinematic city moment",
-  kicker: params.get("kicker") || "Cinema SB pick",
-  meta: params.get("meta") || "Lower Manhattan",
-  description:
-    params.get("description") ||
-    "Open the app to see the full route, save the place, and start the walk.",
+  videoUrl: "",
+  uid: "",
+  title: params.get("title") || defaultMetadata.title,
+  kicker: params.get("kicker") || defaultMetadata.kicker,
+  meta: params.get("meta") || defaultMetadata.meta,
+  description: params.get("description") || defaultMetadata.description,
   poster: params.get("poster") || "",
 };
 
@@ -21,10 +28,6 @@ const downloadLinkEl = document.getElementById("download-link");
 const dismissModalEl = document.getElementById("dismiss-modal");
 const playButtonEl = document.getElementById("play-video-button");
 
-document.getElementById("preview-title").textContent = state.title;
-document.getElementById("preview-kicker").textContent = state.kicker;
-document.getElementById("preview-meta").textContent = state.meta;
-document.getElementById("preview-description").textContent = state.description;
 downloadLinkEl.href = state.appUrl;
 
 for (const element of document.querySelectorAll(".app-interaction")) {
@@ -54,7 +57,149 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-setupVideo();
+void initialize();
+
+async function initialize() {
+  const requestedVideo = resolveRequestedVideo();
+  state.uid = requestedVideo.uid;
+  state.videoUrl = requestedVideo.videoUrl;
+
+  const metadata = await resolveMetadata(state.uid);
+  state.title = metadata.title;
+  state.meta = metadata.meta;
+  state.description = metadata.description;
+
+  document.getElementById("preview-title").textContent = state.title;
+  document.getElementById("preview-kicker").textContent = state.kicker;
+  document.getElementById("preview-meta").textContent = state.meta;
+  document.getElementById("preview-description").textContent = state.description;
+
+  setupVideo();
+}
+
+function normalizeString(value) {
+  return (value || "").trim();
+}
+
+function extractCloudflareUid(url) {
+  const raw = normalizeString(url);
+  if (!raw) {
+    return "";
+  }
+
+  try {
+    const parsed = new URL(raw);
+    if (!parsed.hostname.includes("videodelivery.net")) {
+      return "";
+    }
+    const parts = parsed.pathname.split("/").filter(Boolean);
+    return parts[0] || "";
+  } catch {
+    return /^[a-z0-9]{32}$/i.test(raw) ? raw : "";
+  }
+}
+
+function buildCloudflareVideoUrl(uid) {
+  return `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+}
+
+function resolveRequestedVideo() {
+  const sharedUid = normalizeString(params.get("v"));
+  if (sharedUid) {
+    return {
+      uid: sharedUid,
+      videoUrl: buildCloudflareVideoUrl(sharedUid),
+    };
+  }
+
+  const queryVideo = normalizeString(params.get("video"));
+  if (queryVideo) {
+    return {
+      uid: extractCloudflareUid(queryVideo),
+      videoUrl: queryVideo,
+    };
+  }
+
+  return {
+    uid: extractCloudflareUid(defaultVideoUrl),
+    videoUrl: defaultVideoUrl,
+  };
+}
+
+async function resolveMetadata(uid) {
+  const fetched = await fetchLocationMetadata(uid);
+  if (fetched) {
+    return fetched;
+  }
+
+  return {
+    title: normalizeString(params.get("title")) || defaultMetadata.title,
+    meta: normalizeString(params.get("meta")) || defaultMetadata.meta,
+    description: normalizeString(params.get("description")) || defaultMetadata.description,
+  };
+}
+
+async function fetchLocationMetadata(uid) {
+  if (!uid) {
+    return null;
+  }
+
+  for (const path of ["/api/spots", "/locations"]) {
+    try {
+      const response = await fetch(`${metadataApiBaseUrl}${path}`, { mode: "cors" });
+      if (!response.ok) {
+        continue;
+      }
+
+      const payload = await response.json();
+      const locations = Array.isArray(payload) ? payload : Array.isArray(payload?.data) ? payload.data : [];
+      const match = locations.find((location) => locationMatchesUid(location, uid));
+      if (match) {
+        return {
+          title: normalizeString(match.title) || defaultMetadata.title,
+          meta: buildMetaLine(match),
+          description: buildDescription(match),
+        };
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return null;
+}
+
+function locationMatchesUid(location, uid) {
+  const candidates = [
+    location?.stream_uid,
+    location?.streamUid,
+    location?.stream_hls_url,
+    location?.streamHlsUrl,
+    location?.video_url,
+    location?.videoUrl,
+  ];
+
+  return candidates.some((value) => extractCloudflareUid(value) === uid);
+}
+
+function buildMetaLine(location) {
+  const category =
+    location?.location_categories?.[0]?.categories?.label ||
+    location?.locationCategories?.[0]?.categories?.label ||
+    "";
+
+  return normalizeString(category) || "New York City";
+}
+
+function buildDescription(location) {
+  return (
+    normalizeString(location?.long_desc) ||
+    normalizeString(location?.longDesc) ||
+    normalizeString(location?.short_desc) ||
+    normalizeString(location?.shortDesc) ||
+    defaultMetadata.description
+  );
+}
 
 function setupVideo() {
   if (!state.videoUrl) {
@@ -62,9 +207,8 @@ function setupVideo() {
     return;
   }
 
-  const cloudflareUid = extractCloudflareUid(state.videoUrl);
-  if (cloudflareUid) {
-    setupCloudflarePreview(cloudflareUid);
+  if (state.uid) {
+    setupCloudflarePreview(state.uid);
     return;
   }
 
@@ -153,19 +297,6 @@ function attemptPlayback() {
   }
 }
 
-function extractCloudflareUid(url) {
-  try {
-    const parsed = new URL(url);
-    if (!parsed.hostname.includes("videodelivery.net")) {
-      return "";
-    }
-    const parts = parsed.pathname.split("/").filter(Boolean);
-    return parts[0] || "";
-  } catch {
-    return "";
-  }
-}
-
 function setupCloudflarePreview(uid) {
   iframeEl.src = buildCloudflarePlayerUrl(uid, {
     autoplay: "false",
@@ -180,9 +311,8 @@ function setupCloudflarePreview(uid) {
 }
 
 function handleManualPlayback() {
-  const cloudflareUid = extractCloudflareUid(state.videoUrl);
-  if (cloudflareUid) {
-    iframeEl.src = buildCloudflarePlayerUrl(cloudflareUid, {
+  if (state.uid) {
+    iframeEl.src = buildCloudflarePlayerUrl(state.uid, {
       autoplay: "true",
       muted: "true",
       controls: "true",
@@ -207,9 +337,9 @@ function handleManualPlayback() {
   attemptPlayback();
 }
 
-function buildCloudflarePlayerUrl(uid, params) {
+function buildCloudflarePlayerUrl(uid, nextParams) {
   const url = new URL(`https://iframe.videodelivery.net/${uid}`);
-  Object.entries(params).forEach(([key, value]) => {
+  Object.entries(nextParams).forEach(([key, value]) => {
     url.searchParams.set(key, value);
   });
   return url.toString();
