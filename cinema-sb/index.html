@@ -373,6 +373,15 @@
         return `https://videodelivery.net/${uid}/manifest/video.m3u8`;
       }
 
+      function buildCloudflarePlayerUrl(uid) {
+        const playerUrl = new URL(`https://iframe.videodelivery.net/${uid}`);
+        playerUrl.searchParams.set("autoplay", "true");
+        playerUrl.searchParams.set("muted", "true");
+        playerUrl.searchParams.set("controls", "true");
+        playerUrl.searchParams.set("loop", "true");
+        return playerUrl.toString();
+      }
+
       function resolveRequestedVideo() {
         const currentUrl = new URL(window.location.href);
         const sharedUid = normalizeString(currentUrl.searchParams.get("v"));
@@ -414,8 +423,9 @@
           }
         }
 
+        const defaultUid = extractCloudflareUid(defaultVideoUrl);
         return {
-          uid: extractCloudflareUid(defaultVideoUrl),
+          uid: defaultUid,
           videoUrl: defaultVideoUrl
         };
       }
@@ -449,7 +459,8 @@
               return {
                 title: normalizeString(match.title) || defaultMetadata.title,
                 meta: buildMetaLine(match),
-                description: buildDescription(match)
+                description: buildDescription(match),
+                videoUrl: resolveLocationVideoUrl(match, uid)
               };
             }
           } catch {
@@ -474,7 +485,14 @@
       }
 
       function buildMetaLine(location) {
+        const neighborhood = normalizeString(location?.neighborhood);
+        if (neighborhood) {
+          return neighborhood;
+        }
+
         const category =
+          location?.category ||
+          location?.city ||
           location?.location_categories?.[0]?.categories?.label ||
           location?.locationCategories?.[0]?.categories?.label ||
           "";
@@ -498,13 +516,23 @@
         return fetched || fallback;
       }
 
+      function resolveLocationVideoUrl(location, uid) {
+        return (
+          normalizeString(location?.video_url) ||
+          normalizeString(location?.videoUrl) ||
+          normalizeString(location?.stream_hls_url) ||
+          normalizeString(location?.streamHlsUrl) ||
+          (uid ? buildCloudflareVideoUrl(uid) : "")
+        );
+      }
+
       async function loadVideo() {
         frame.innerHTML = "";
 
         const requestedVideo = resolveRequestedVideo();
         const metadata = await resolveMetadata(requestedVideo.uid);
         const uid = requestedVideo.uid;
-        const url = requestedVideo.videoUrl;
+        const url = metadata.videoUrl || requestedVideo.videoUrl;
 
         const overlay = document.createElement("div");
         overlay.className = "frame-overlay";
@@ -518,12 +546,7 @@
 
         if (uid) {
           const iframe = document.createElement("iframe");
-          const playerUrl = new URL(`https://iframe.videodelivery.net/${uid}`);
-          playerUrl.searchParams.set("autoplay", "true");
-          playerUrl.searchParams.set("muted", "true");
-          playerUrl.searchParams.set("controls", "true");
-          playerUrl.searchParams.set("loop", "true");
-          iframe.src = playerUrl.toString();
+          iframe.src = buildCloudflarePlayerUrl(uid);
           iframe.allow = "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture";
           iframe.allowFullscreen = true;
           frame.appendChild(iframe);

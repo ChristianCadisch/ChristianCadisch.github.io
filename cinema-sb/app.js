@@ -68,6 +68,7 @@ async function initialize() {
   state.title = metadata.title;
   state.meta = metadata.meta;
   state.description = metadata.description;
+  state.videoUrl = metadata.videoUrl || state.videoUrl;
 
   document.getElementById("preview-title").textContent = state.title;
   document.getElementById("preview-kicker").textContent = state.kicker;
@@ -159,6 +160,7 @@ async function fetchLocationMetadata(uid) {
           title: normalizeString(match.title) || defaultMetadata.title,
           meta: buildMetaLine(match),
           description: buildDescription(match),
+          videoUrl: resolveLocationVideoUrl(match, uid),
         };
       }
     } catch {
@@ -183,7 +185,14 @@ function locationMatchesUid(location, uid) {
 }
 
 function buildMetaLine(location) {
+  const neighborhood = normalizeString(location?.neighborhood);
+  if (neighborhood) {
+    return neighborhood;
+  }
+
   const category =
+    location?.category ||
+    location?.city ||
     location?.location_categories?.[0]?.categories?.label ||
     location?.locationCategories?.[0]?.categories?.label ||
     "";
@@ -198,6 +207,16 @@ function buildDescription(location) {
     normalizeString(location?.short_desc) ||
     normalizeString(location?.shortDesc) ||
     defaultMetadata.description
+  );
+}
+
+function resolveLocationVideoUrl(location, uid) {
+  return (
+    normalizeString(location?.video_url) ||
+    normalizeString(location?.videoUrl) ||
+    normalizeString(location?.stream_hls_url) ||
+    normalizeString(location?.streamHlsUrl) ||
+    (uid ? buildCloudflareVideoUrl(uid) : "")
   );
 }
 
